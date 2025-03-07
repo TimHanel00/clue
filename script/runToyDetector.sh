@@ -39,7 +39,7 @@ done
 
 for tbbnthreads in 1 4 8 16
 # for tbbnthreads in 1 10 20 40
-do 
+do
 
   echo "----------------"
   echo "running with CUPLA CPU TBB nthreads=" $tbbnthreads
