@@ -3,8 +3,8 @@
 #       runtime via a flag.
 
 if(CMAKE_CUDA_COMPILER)
-  set_source_files_properties(${PROJECT_SOURCE_DIR}/src/main.cc PROPERTIES LANGUAGE CUDA)
-  add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cc)
+  set_source_files_properties(${PROJECT_SOURCE_DIR}/src/main.cpp PROPERTIES LANGUAGE CUDA)
+  add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
   target_compile_definitions(main PRIVATE)
   target_compile_options(main PRIVATE

@@ -16,15 +16,15 @@ set(ALPAKA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/alpaka CACHE PATH "Path to ALPAKA (by
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Check for CUDA
-include(CheckLanguage)
-check_language(CUDA)
-if(CMAKE_CUDA_COMPILER)
-  enable_language(CUDA)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CUDA_ARCHITECTURES "60;70;75")
-else()
-  message(STATUS "No CUDA compiler found. Still, you can run the C++ version!")
-endif()
+#include(CheckLanguage)
+#check_language(CUDA)
+#if(CMAKE_CUDA_COMPILER)
+#  enable_language(CUDA)
+#  set(CMAKE_CXX_STANDARD 20)
+#  set(CMAKE_CUDA_ARCHITECTURES "60;70;75")
+#else()
+#  message(STATUS "No CUDA compiler found. Still, you can run the C++ version!")
+#endif()
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set (CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/install" CACHE PATH "default install path" FORCE )
@@ -33,27 +33,29 @@ endif()
 include(GNUInstallDirs)
 
 # Set up C++ Standard
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "")
 
 if(NOT CMAKE_CXX_STANDARD MATCHES "17|20")
   message(FATAL_ERROR "Unsupported C++ standard: ${CMAKE_CXX_STANDARD}")
 endif()
 
 # Find Boost
-set(Boost_DEBUG 1)
-find_package(Boost REQUIRED)
+#set(Boost_DEBUG 1)
+#find_package(Boost REQUIRED)
 
 # Include Boost headers
-include_directories(${Boost_INCLUDE_DIRS})
+#include_directories(${Boost_INCLUDE_DIRS})
 
-if(Boost_FOUND)
-  message(STATUS "Boost package found!")
-endif()
+#if(Boost_FOUND)
+#  message(STATUS "Boost package found!")
+#endif()
 
 #find_package(TBB REQUIRED)
 #if(TBB_FOUND)
 #  message(STATUS "TBB package found!")
 #endif()
+
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/alpaka")
 
 add_subdirectory(clueLib)
 add_subdirectory(src)

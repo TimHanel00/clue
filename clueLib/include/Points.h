@@ -17,7 +17,6 @@ struct Points
     float const* p_weight;
     float const* p_sigmaNoise;
 
-
     std::vector<float> rho;
     std::vector<float> delta;
     std::vector<unsigned int> nearestHigher;

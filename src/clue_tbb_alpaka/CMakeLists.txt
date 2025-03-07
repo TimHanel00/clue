@@ -2,8 +2,8 @@
 #       corresponding TBB one built using ALPAKA. Which one to use must be
 #       selected at runtime via a flag.
 
-set_source_files_properties(${PROJECT_SOURCE_DIR}/src/main.cc PROPERTIES LANGUAGE CXX)
-add_executable(mainAlpakaTBB ${PROJECT_SOURCE_DIR}/src/main.cc)
+set_source_files_properties(${PROJECT_SOURCE_DIR}/src/main.cpp PROPERTIES LANGUAGE CXX)
+add_executable(mainAlpakaTBB ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_compile_definitions(mainAlpakaTBB PRIVATE USE_ALPAKA ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED)
 target_link_libraries(mainAlpakaTBB PRIVATE CLUELib TBB::tbb pthread)
 

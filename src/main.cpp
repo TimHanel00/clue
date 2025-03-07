@@ -209,15 +209,36 @@ void mainRun(
 #elif defined(USE_ALPAKA)
         std::cout << "ALPAKA 'Backend' selected" << std::endl;
         using namespace alpaka;
+        using namespace alpaka::onHost;
         // Define the index domain
-        using Dim = alpaka::DimInt<1u>;
-        using Idx = uint32_t;
-        using Acc = SelectedAcc<Dim, Idx>;
-        CLUEAlgoAlpaka<Acc, alpaka::Queue<Acc, alpaka::NonBlocking>, TilesConstants, NLAYERS> clueAlgo(
-            dc,
-            rhoc,
-            outlierDeltaFactor,
-            verbose);
+
+#    if 1
+        auto api = api::cuda;
+        auto exec = exec::gpuCuda;
+#    else
+        auto api = api::cpu;
+        auto exec = exec::cpuSerial;
+#    endif
+
+        std::cout << api.getName() << std::endl;
+
+        Platform platform = makePlatform(api);
+        Device computeDevice = platform.makeDevice(0);
+        std::cout << getName(platform) << " compute device=" << computeDevice.getName() << std::endl;
+
+        Queue queue = computeDevice.makeQueue();
+
+        Platform cpuPlatform = makePlatform(api::cpu);
+        Device cpuDevice = cpuPlatform.makeDevice(0);
+
+        CLUEAlgoAlpaka<
+            ALPAKA_TYPEOF(exec),
+            ALPAKA_TYPEOF(computeDevice),
+            ALPAKA_TYPEOF(queue),
+            ALPAKA_TYPEOF(cpuDevice),
+            TilesConstants,
+            NLAYERS>
+            clueAlgo(computeDevice, queue, cpuDevice, dc, rhoc, outlierDeltaFactor, verbose);
         vals.clear();
         for(unsigned r = 0; r < repeats; r++)
         {
@@ -248,7 +269,7 @@ void mainRun(
         std::cout << "Native CPU(serial) Backend selected" << std::endl;
         CLUEAlgo<TilesConstants, NLAYERS> clueAlgo(dc, rhoc, outlierDeltaFactor, verbose);
         vals.clear();
-        for(int r = 0; r < repeats; r++)
+        for(unsigned r = 0; r < repeats; r++)
         {
             if(!clueAlgo.setPoints(x.size(), &x[0], &y[0], &layer[0], &weight[0]))
                 exit(EXIT_FAILURE);
@@ -257,7 +278,8 @@ void mainRun(
             clueAlgo.makeClusters();
             auto finish = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed = finish - start;
-            std::cout << "Elapsed time: " << elapsed.count() * 1000 << " ms\n";
+            std::cout << "Iteration " << r;
+            std::cout << " | Elapsed time: " << elapsed.count() * 1000 << " ms\n";
             // Skip first event
             if(r != 0 or repeats == 1)
             {
