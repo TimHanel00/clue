@@ -514,29 +514,21 @@ operator()(
                     bool foundHigher = (ptrs_.rho[j] > rhoi);
                     // in the rare case where rho is the same, use indices
                     foundHigher = foundHigher || ((ptrs_.rho[j] == rhoi) && (j > i));
-                    if(foundHigher && dist_ij < deltai)
+
+                    bool condition
+                        = foundHigher && dist_ij < deltai
+                          || dist_ij == deltai && ((ptrs_.rho[j] > rho_max) || (ptrs_.rho[j] == rho_max && j > i));
+                    if(condition)
                     {
                         rho_max = ptrs_.rho[j];
                         deltai = dist_ij;
                         nearestHigheri = j;
                     }
-                    else if(foundHigher && dist_ij == deltai && ptrs_.rho[j] > rho_max)
-                    {
-                        rho_max = ptrs_.rho[j];
-                        deltai = dist_ij;
-                        nearestHigheri = j;
-                    }
-                    else if(foundHigher && dist_ij == deltai && ptrs_.rho[j] == rho_max && j > i)
-                    {
-                        rho_max = ptrs_.rho[j];
-                        deltai = dist_ij;
-                        nearestHigheri = j;
-                    }
-                } // end of interate inside this bin
-            }
-        } // end of loop over bins in search box
-        ptrs_.delta[i] = std::sqrt(deltai);
-        ptrs_.nearestHigher[i] = nearestHigheri;
+                }
+            } // end of loop over bins in search box
+            ptrs_.delta[i] = std::sqrt(deltai);
+            ptrs_.nearestHigher[i] = nearestHigheri;
+        }
     }
 }
 
@@ -597,20 +589,12 @@ operator()(
                     bool foundHigher = (ptrs_.rho[j] > rhoi);
                     // in the rare case where rho is the same, use detid
                     foundHigher = foundHigher || ((ptrs_.rho[j] == rhoi) && (ptrs_.detid[j] > ptrs_.detid[i]));
-                    if(foundHigher && dist_ij < deltai)
-                    {
-                        rho_max = ptrs_.rho[j];
-                        deltai = dist_ij;
-                        nearestHigheri = j;
-                    }
-                    else if(foundHigher && dist_ij == deltai && ptrs_.rho[j] > rho_max)
-                    {
-                        rho_max = ptrs_.rho[j];
-                        deltai = dist_ij;
-                        nearestHigheri = j;
-                    }
-                    else if(
-                        foundHigher && dist_ij == deltai && ptrs_.rho[j] == rho_max && ptrs_.detid[j] > ptrs_.detid[i])
+
+                    bool condition = foundHigher && dist_ij < deltai
+                                     || dist_ij == deltai
+                                            && ((ptrs_.rho[j] > rho_max)
+                                                || (ptrs_.rho[j] == rho_max && ptrs_.detid[j] > ptrs_.detid[i]));
+                    if(condition)
                     {
                         rho_max = ptrs_.rho[j];
                         deltai = dist_ij;
@@ -634,34 +618,71 @@ operator()(
     float kappa,
     unsigned int const numberOfPoints) const -> void
 {
-    for(auto [i] :
-        alpaka::onAcc::makeIdxMap(acc, alpaka::onAcc::worker::threadsInGrid, alpaka::IdxRange{numberOfPoints}))
-    {
-        // initialize clusterIndex
-        ptrs_.clusterIndex[i] = -1;
-        // determine seed or outlier
-        float deltai = ptrs_.delta[i];
-        float rhoi = ptrs_.rho[i];
-        float rhoc = ptrs_.sigmaNoise[i] * kappa;
-        bool isSeed = (deltai > dc) && (rhoi >= rhoc);
-        bool isOutlier = (deltai > outlierDeltaFactor * dc) && (rhoi < rhoc);
+    auto clusterIndexSpan = makeMdSpan(
+        ptrs_.clusterIndex,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(int)},
+        alpaka::Alignment<sizeof(int)>{});
 
-        if(isSeed)
+    auto deltaSpan = makeMdSpan(
+        ptrs_.delta,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(float)},
+        alpaka::Alignment<sizeof(float)>{});
+
+    auto rohSpan = makeMdSpan(
+        ptrs_.rho,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(float)},
+        alpaka::Alignment<sizeof(float)>{});
+
+    auto sigmaNoiseSpan = makeMdSpan(
+        ptrs_.sigmaNoise,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(float)},
+        alpaka::Alignment<sizeof(float)>{});
+
+    auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
+    simdGrid.concurrent<8>(
+        acc,
+        [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh, auto&& simdSigmaNoise) constexpr
         {
-            // set isSeed as 1
-            ptrs_.isSeed[i] = 1;
-            ptrs_.seeds_[0].push_back(acc, i); // head of device_seeds_
-        }
-        else
-        {
-            if(!isOutlier)
+            // initialize clusterIndex
+            simdClusterIdx = ALPAKA_TYPEOF(simdClusterIdx.load())::all(-1);
+
+            // determine seed or outlier
+            alpaka::concepts::Simd auto deltai = simdDelta.load();
+            alpaka::concepts::Simd auto rhoi = simdRoh.load();
+            alpaka::concepts::Simd auto rhoc = simdSigmaNoise.load() * kappa;
+            alpaka::concepts::Simd auto isSeed = (deltai > dc) && (rhoi >= rhoc);
+            alpaka::concepts::Simd auto isOutlier = (deltai > outlierDeltaFactor * dc) && (rhoi < rhoc);
+
+            auto idxOffset = simdDelta.getIdx().x();
+            for(int sIdx = 0; sIdx < alpaka::getDim(isSeed); ++sIdx)
             {
-                assert(ptrs_.nearestHigher[i] < numberOfPoints);
-                // register as follower at its nearest higher
-                ptrs_.followers_[ptrs_.nearestHigher[i]].push_back(acc, i);
+                int i = idxOffset + sIdx;
+                if(isSeed[sIdx])
+                {
+                    // set isSeed as 1
+                    ptrs_.isSeed[i] = 1;
+                    // head of device_seeds_
+                    ptrs_.seeds_[0].push_back(acc, i);
+                }
+                else
+                {
+                    if(!isOutlier[sIdx])
+                    {
+                        assert(ptrs_.nearestHigher[i] < numberOfPoints);
+                        // register as follower at its nearest higher
+                        ptrs_.followers_[ptrs_.nearestHigher[i]].push_back(acc, i);
+                    }
+                }
             }
-        }
-    }
+        },
+        clusterIndexSpan,
+        deltaSpan,
+        rohSpan,
+        sigmaNoiseSpan);
 }
 
 template<typename TExecutor, typename TComputeDevice, typename TQueue, typename THostDevice, typename T, int NLAYERS>
@@ -674,33 +695,63 @@ operator()(
     float rhoc,
     unsigned int const numberOfPoints) const -> void
 {
-    for(auto [i] :
-        alpaka::onAcc::makeIdxMap(acc, alpaka::onAcc::worker::threadsInGrid, alpaka::IdxRange{numberOfPoints}))
-    {
-        // initialize clusterIndex
-        ptrs_.clusterIndex[i] = -1;
-        // determine seed or outlier
-        float deltai = ptrs_.delta[i];
-        float rhoi = ptrs_.rho[i];
-        bool isSeed = (deltai > dc) && (rhoi >= rhoc);
-        bool isOutlier = (deltai > outlierDeltaFactor * dc) && (rhoi < rhoc);
+    auto clusterIndexSpan = makeMdSpan(
+        ptrs_.clusterIndex,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(int)},
+        alpaka::Alignment<sizeof(int)>{});
 
-        if(isSeed)
+    auto deltaSpan = makeMdSpan(
+        ptrs_.delta,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(float)},
+        alpaka::Alignment<sizeof(float)>{});
+
+    auto rohSpan = makeMdSpan(
+        ptrs_.rho,
+        alpaka::Vec{numberOfPoints},
+        alpaka::Vec{sizeof(float)},
+        alpaka::Alignment<sizeof(float)>{});
+
+    auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
+    simdGrid.concurrent<8>(
+        acc,
+        [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh) constexpr
         {
-            // set isSeed as 1
-            ptrs_.isSeed[i] = 1;
-            ptrs_.seeds_[0].push_back(acc, i); // head of device_seeds_
-        }
-        else
-        {
-            if(!isOutlier)
+            // initialize clusterIndex
+            simdClusterIdx = ALPAKA_TYPEOF(simdClusterIdx.load())::all(-1);
+
+            // determine seed or outlier
+            alpaka::concepts::Simd auto deltai = simdDelta.load();
+            alpaka::concepts::Simd auto rhoi = simdRoh.load();
+            alpaka::concepts::Simd auto isSeed = (deltai > dc) && (rhoi >= rhoc);
+            alpaka::concepts::Simd auto isOutlier = (deltai > outlierDeltaFactor * dc) && (rhoi < rhoc);
+
+            auto idxOffset = simdDelta.getIdx().x();
+            for(int sIdx = 0; sIdx < alpaka::getDim(isSeed); ++sIdx)
             {
-                assert(ptrs_.nearestHigher[i] < numberOfPoints);
-                // register as follower at its nearest higher
-                ptrs_.followers_[ptrs_.nearestHigher[i]].push_back(acc, i);
+                int i = idxOffset + sIdx;
+                if(isSeed[sIdx])
+                {
+                    // set isSeed as 1
+                    ptrs_.isSeed[i] = 1;
+                    // head of device_seeds_
+                    ptrs_.seeds_[0].push_back(acc, i);
+                }
+                else
+                {
+                    if(!isOutlier[sIdx])
+                    {
+                        assert(ptrs_.nearestHigher[i] < numberOfPoints);
+                        // register as follower at its nearest higher
+                        ptrs_.followers_[ptrs_.nearestHigher[i]].push_back(acc, i);
+                    }
+                }
             }
-        }
-    }
+        },
+        clusterIndexSpan,
+        deltaSpan,
+        rohSpan);
 }
 
 template<typename TExecutor, typename TComputeDevice, typename TQueue, typename THostDevice, typename T, int NLAYERS>
@@ -800,6 +851,10 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
         dc_,
         static_cast<int>(points_.n)));
 
+    alpaka::Vec<Idx, dim> const blocksPerGridSimd(
+        static_cast<Idx>(ceil(points_.n / ((float) threadsPerBlock[0] * 2u))));
+    auto const manualWorkDivSimd = alpaka::onHost::FrameSpec{blocksPerGridSimd, threadsPerBlock};
+
     typename CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>::DeviceRunner::
         KernelFindClusters taskFindClusters;
     auto const kernelFindClusters = (alpaka::KernelBundle(
@@ -857,11 +912,11 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     start = std::chrono::high_resolution_clock::now();
     if(useAbsoluteSigma_)
     {
-        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelFindClustersKappa);
+        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivSimd, kernelFindClustersKappa);
     }
     else
     {
-        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelFindClusters);
+        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivSimd, kernelFindClusters);
     }
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime

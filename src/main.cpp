@@ -58,7 +58,7 @@ pair<float, float> stats(std::vector<float> const& v)
     return {m, std::sqrt(sum / den)};
 }
 
-void printTimingReport(std::vector<float>& vals, int repeats, const std::string label = "SUMMARY ")
+void printTimingReport(std::vector<float>& vals, int repeats, std::string const label = "SUMMARY ")
 {
     int precision = 2;
     float mean = 0.f;
@@ -212,9 +212,13 @@ void mainRun(
         using namespace alpaka::onHost;
         // Define the index domain
 
-#    if 1
+#    define backend 0
+#    if backend == 0
         auto api = api::cuda;
         auto exec = exec::gpuCuda;
+#    elif backend == 1
+        auto api = api::cpu;
+        auto exec = exec::cpuOmpBlocks;
 #    else
         auto api = api::cpu;
         auto exec = exec::cpuSerial;
