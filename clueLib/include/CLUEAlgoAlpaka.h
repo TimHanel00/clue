@@ -772,7 +772,7 @@ operator()(
     }
     for(auto [idxCls] : alpaka::onAcc::makeIdxMap(
             acc,
-            alpaka::onAcc::worker::threadsInGrid,
+            alpaka::onAcc::worker::blocksInGrid,
             alpaka::IdxRange{(unsigned int) ptrs_.seeds_[0].size()}))
     {
         int localStack[localStackSizePerSeed] = {-1};
@@ -780,34 +780,49 @@ operator()(
 
         // assign cluster to seed[idxCls]
         int idxThisSeed = ptrs_.seeds_[0][idxCls];
-        ptrs_.clusterIndex[idxThisSeed] = idxCls;
-        // push_back idThisSeed to localStack
-        assert(localStackSize < localStackSizePerSeed);
-        localStack[localStackSize] = idxThisSeed;
-        localStackSize++;
-
-        // process all elements in localStack
-        while(localStackSize > 0)
+        for(auto [idxCls] :
+            alpaka::onAcc::makeIdxMap(acc, alpaka::onAcc::worker::threadsInBlock, alpaka::IdxRange{1u}))
         {
-            // get last element of localStack
-            assert(localStackSize - 1 < localStackSizePerSeed);
-            int idxEndOflocalStack = localStack[localStackSize - 1];
+            ptrs_.clusterIndex[idxThisSeed] = idxCls;
+        }
 
-            int temp_clusterIndex = ptrs_.clusterIndex[idxEndOflocalStack];
-            // pop_back last element of localStack
-            assert(localStackSize - 1 < localStackSizePerSeed);
-            localStack[localStackSize - 1] = -1;
-            localStackSize--;
+        // push_back idThisSeed to localStack
 
-            // loop over followers of last element of localStack
-            for(int j : ptrs_.followers_[idxEndOflocalStack])
+
+        for(auto [stackIdx] : alpaka::onAcc::makeIdxMap(
+                acc,
+                alpaka::onAcc::worker::threadsInBlock,
+                alpaka::IdxRange{(unsigned int) ptrs_.followers_[idxThisSeed].size()}))
+        {
+            assert(localStackSize < localStackSizePerSeed);
+            int rootIdx =  ptrs_.followers_[idxThisSeed][stackIdx];
+            localStack[localStackSize] = rootIdx;
+            ptrs_.clusterIndex[rootIdx] = idxCls;
+            localStackSize++;
+
+            // process all elements in localStack
+            while(localStackSize > 0)
             {
-                // pass id to follower
-                ptrs_.clusterIndex[j] = temp_clusterIndex;
-                // push_back follower to localStack
-                assert(localStackSize < localStackSizePerSeed);
-                localStack[localStackSize] = j;
-                localStackSize++;
+                // get last element of localStack
+                assert(localStackSize - 1 < localStackSizePerSeed);
+                int idxEndOflocalStack = localStack[localStackSize - 1];
+
+                int temp_clusterIndex = ptrs_.clusterIndex[idxEndOflocalStack];
+                // pop_back last element of localStack
+                assert(localStackSize - 1 < localStackSizePerSeed);
+                localStack[localStackSize - 1] = -1;
+                localStackSize--;
+
+                // loop over followers of last element of localStack
+                for(int j : ptrs_.followers_[idxEndOflocalStack])
+                {
+                    // pass id to follower
+                    ptrs_.clusterIndex[j] = temp_clusterIndex;
+                    // push_back follower to localStack
+                    assert(localStackSize < localStackSizePerSeed);
+                    localStack[localStackSize] = j;
+                    localStackSize++;
+                }
             }
         }
     }
@@ -875,6 +890,12 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
         kappa_,
         static_cast<int>(points_.n)));
 
+    // Dimension the grid for submission
+    alpaka::Vec<Idx, dim> const threadsPerBlockX(64u);
+    alpaka::Vec<Idx, dim> const blocksPerGridX(static_cast<Idx>(ceil(points_.n / (float) threadsPerBlock[0])));
+
+    auto const manualWorkDivX = alpaka::onHost::FrameSpec{blocksPerGridX, threadsPerBlockX};
+
     typename CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>::DeviceRunner::
         KernelAssignClusters taskAssignClusters;
     auto const kernelAssignClusters = (alpaka::KernelBundle(device_runner_, taskAssignClusters, nullptr, false));
@@ -925,7 +946,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- findClusters:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelAssignClusters);
+    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivX, kernelAssignClusters);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();

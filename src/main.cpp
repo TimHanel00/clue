@@ -212,7 +212,7 @@ void mainRun(
         using namespace alpaka::onHost;
         // Define the index domain
 
-#    define backend 0
+#    define backend 2
 #    if backend == 0
         auto api = api::cuda;
         auto exec = exec::gpuCuda;
