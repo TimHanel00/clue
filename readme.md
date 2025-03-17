@@ -71,13 +71,19 @@ The test program accept the following parameter from the command line:
 If the projects compiles without errors, you can go run the CLUE algorithm by
 ```bash
 # alpaka cpu serial
-./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u CpuSerial
+./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u CpuSerial
 
 # alpaka gpu CUDA
-./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuCuda
+./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuCuda
+
+# alpaka gpu OpenMP
+./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuOmpBlocks
 
 # in case of original CPU without alpaka
 ./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v
+
+# in case of original CUDA without alpaka
+./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u "cuda"
 ```
 
 The input files are `data/input/*.csv` with columns 

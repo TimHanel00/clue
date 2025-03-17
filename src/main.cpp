@@ -20,10 +20,6 @@
 #    include "CLUEAlgoGPU.h"
 #endif
 
-#ifdef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED
-#    include "tbb/global_control.h"
-#endif
-
 #define NLAYERS 100
 
 using namespace std;
@@ -350,19 +346,11 @@ int main(int argc, char* argv[])
         default:
             std::cout << "bin/main -i [fileName] -d [dc] -r [rhoc] -o "
                          "[outlierDeltaFactor] -e [repeats] -t "
-                         "[NumTBBThreads] -u -v"
+                         "[NumTBBThreads] -u [executor] -v"
                       << std::endl;
             exit(EXIT_FAILURE);
         }
     }
-
-#ifdef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED
-    if(verbose)
-    {
-        std::cout << "Setting up " << TBBNumberOfThread << " TBB Threads" << std::endl;
-    }
-    tbb::global_control init(tbb::global_control::max_allowed_parallelism, TBBNumberOfThread);
-#endif
 
     //////////////////////////////
     // MARK -- set input and output files
@@ -375,51 +363,72 @@ int main(int argc, char* argv[])
     //////////////////////////////
     // MARK -- test run
     //////////////////////////////
-#if defined(USE_ALPAKA)
-
-    if(list_alpaka_executors)
+    if(use_accelerator)
     {
-        std::cout << "alpaka executors" << std::endl;
-        alpaka::executeForEach(
+#if defined(USE_ALPAKA)
+        if(list_alpaka_executors)
+        {
+            std::cout << "alpaka executors" << std::endl;
+            alpaka::executeForEach(
+                [&](auto const& cfg)
+                {
+                    std::cout << "  " << alpaka::onHost::getStaticName(cfg[alpaka::object::exec]) << std::endl;
+                    return 0;
+                },
+                alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
+            return 0;
+        }
+
+        return alpaka::executeForEach(
             [&](auto const& cfg)
             {
-                std::cout << "  " << alpaka::onHost::getStaticName(cfg[alpaka::object::exec]) << std::endl;
+                if(alpakaExecutor == alpaka::onHost::getStaticName(cfg[alpaka::object::exec]))
+                    mainRun(
+                        inputFileName,
+                        outputFileName,
+                        dc,
+                        rhoc,
+                        outlierDeltaFactor,
+                        use_accelerator,
+                        cfg,
+                        repeats,
+                        verbose);
+
                 return 0;
             },
             alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
-        return 0;
-    }
-
-    return alpaka::executeForEach(
-        [&](auto const& cfg)
-        {
-            if(alpakaExecutor == alpaka::onHost::getStaticName(cfg[alpaka::object::exec]))
-                mainRun(
-                    inputFileName,
-                    outputFileName,
-                    dc,
-                    rhoc,
-                    outlierDeltaFactor,
-                    use_accelerator,
-                    cfg,
-                    repeats,
-                    verbose);
-
-            return 0;
-        },
-        alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
 #else
-    mainRun(
-        inputFileName,
-        outputFileName,
-        dc,
-        rhoc,
-        outlierDeltaFactor,
-        use_accelerator,
-        std::make_tuple(1, 1),
-        repeats,
-        verbose);
+        mainRun(
+            inputFileName,
+            outputFileName,
+            dc,
+            rhoc,
+            outlierDeltaFactor,
+            use_accelerator,
+            // dummy, not used if alpaka is disabled
+            std::make_tuple(1, 1),
+            repeats,
+            verbose);
 #endif
-
+    }
+    else
+    {
+        mainRun(
+            inputFileName,
+            outputFileName,
+            dc,
+            rhoc,
+            outlierDeltaFactor,
+            use_accelerator,
+        // dummy, not used if alpaka is disabled
+#if defined(USE_ALPAKA)
+            // select the first valid accelerator, -u is not set therefor we need only a valid configuration
+            std::get<0>(alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis)),
+#else
+            std::make_tuple(1, 1),
+#endif
+            repeats,
+            verbose);
+    }
     return 0;
 }

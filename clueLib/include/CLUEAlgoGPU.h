@@ -363,7 +363,7 @@ __global__ void kernel_calculate_distanceToHigher(
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    float constat dm = outlierDeltaFactor * dc;
+    float const dm = outlierDeltaFactor * dc;
 
     if(i < numberOfPoints)
     {
@@ -432,7 +432,7 @@ __global__ void kernel_calculate_distanceToHigherTile(
 
     if(bin < d_hist[layeri][globalBinOnLayer].size())
     {
-        float constat dm = outlierDeltaFactor * dc;
+        float const dm = outlierDeltaFactor * dc;
 
         int i = d_hist[layeri][globalBinOnLayer][bin];
         float deltai = std::numeric_limits<float>::max();
@@ -572,8 +572,8 @@ __global__ void kernel_assign_clusters(
     cudaStream_t)
 {
     int idxCls = blockIdx.x * blockDim.x + threadIdx.x;
-    auto constto& seeds = d_seeds[0];
-    auto constto nSeeds = seeds.size();
+    auto const& seeds = d_seeds[0];
+    auto const nSeeds = seeds.size();
     if(idxCls < nSeeds)
     {
         int localStack[localStackSizePerSeed] = {-1};
