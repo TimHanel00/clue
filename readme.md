@@ -62,16 +62,21 @@ The test program accept the following parameter from the command line:
   timing performance.
 * `-t number_TBB_threads`: set the number of TBB threads to be used (when this
   makes sense)
-* `-u use_accelerator`: enable the GPU version of the executable run. Every
+* `-u accelerator`: run with the alpaka executor. You can find valid options with `-U` Every
   single executable, in fact, has both the CPU and the GPU version embedded.
+* `-U`: list enabled alpaka executors.
 * `-v verbose`: activate verbose output. Among other things, this will also
   enable the saving of the results of the clustering steps in local text files.
 
 If the projects compiles without errors, you can go run the CLUE algorithm by
 ```bash
-./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u
+# alpaka cpu serial
+./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u CpuSerial
 
-# in case of only CPU
+# alpaka gpu CUDA
+./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuCuda
+
+# in case of original CPU without alpaka
 ./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v
 ```
 

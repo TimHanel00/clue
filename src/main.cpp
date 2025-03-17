@@ -13,6 +13,9 @@
 
 #if defined(USE_ALPAKA)
 #    include "CLUEAlgoAlpaka.h"
+
+#    include <alpaka/example/executeForEach.hpp>
+#    include <alpaka/example/executors.hpp>
 #else
 #    include "CLUEAlgoGPU.h"
 #endif
@@ -131,6 +134,7 @@ void mainRun(
     float const rhoc,
     float const outlierDeltaFactor,
     bool const use_accelerator,
+    auto alpakaCfg,
     int const repeats,
     bool const verbose)
 {
@@ -212,17 +216,8 @@ void mainRun(
         using namespace alpaka::onHost;
         // Define the index domain
 
-#    define backend 2
-#    if backend == 0
-        auto api = api::cuda;
-        auto exec = exec::gpuCuda;
-#    elif backend == 1
-        auto api = api::cpu;
-        auto exec = exec::cpuOmpBlocks;
-#    else
-        auto api = api::cpu;
-        auto exec = exec::cpuSerial;
-#    endif
+        auto api = alpakaCfg[alpaka::object::api];
+        auto exec = alpakaCfg[alpaka::object::exec];
 
         std::cout << api.getName() << std::endl;
 
@@ -315,8 +310,10 @@ int main(int argc, char* argv[])
     int TBBNumberOfThread = 1;
     int opt;
     std::string inputFileName;
+    std::string alpakaExecutor;
+    bool list_alpaka_executors = false;
 
-    while((opt = getopt(argc, argv, "i:d:r:o:e:t:uv")) != -1)
+    while((opt = getopt(argc, argv, "i:d:r:o:e:t:u:Uv")) != -1)
     {
         switch(opt)
         {
@@ -342,6 +339,10 @@ int main(int argc, char* argv[])
             break;
         case 'u': /* Use accelerator */
             use_accelerator = true;
+            alpakaExecutor = string(optarg);
+            break;
+        case 'U': /* Use accelerator */
+            list_alpaka_executors = true;
             break;
         case 'v': /* Verbose output */
             verbose = true;
@@ -374,7 +375,51 @@ int main(int argc, char* argv[])
     //////////////////////////////
     // MARK -- test run
     //////////////////////////////
-    mainRun(inputFileName, outputFileName, dc, rhoc, outlierDeltaFactor, use_accelerator, repeats, verbose);
+#if defined(USE_ALPAKA)
+
+    if(list_alpaka_executors)
+    {
+        std::cout << "alpaka executors" << std::endl;
+        alpaka::executeForEach(
+            [&](auto const& cfg)
+            {
+                std::cout << "  " << alpaka::onHost::getStaticName(cfg[alpaka::object::exec]) << std::endl;
+                return 0;
+            },
+            alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
+        return 0;
+    }
+
+    return alpaka::executeForEach(
+        [&](auto const& cfg)
+        {
+            if(alpakaExecutor == alpaka::onHost::getStaticName(cfg[alpaka::object::exec]))
+                mainRun(
+                    inputFileName,
+                    outputFileName,
+                    dc,
+                    rhoc,
+                    outlierDeltaFactor,
+                    use_accelerator,
+                    cfg,
+                    repeats,
+                    verbose);
+
+            return 0;
+        },
+        alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
+#else
+    mainRun(
+        inputFileName,
+        outputFileName,
+        dc,
+        rhoc,
+        outlierDeltaFactor,
+        use_accelerator,
+        std::make_tuple(1, 1),
+        repeats,
+        verbose);
+#endif
 
     return 0;
 }
