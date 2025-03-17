@@ -643,7 +643,7 @@ operator()(
         alpaka::Alignment<sizeof(float)>{});
 
     auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
-    simdGrid.concurrent<8>(
+    simdGrid.concurrent(
         acc,
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh, auto&& simdSigmaNoise) constexpr
         {
@@ -714,7 +714,7 @@ operator()(
         alpaka::Alignment<sizeof(float)>{});
 
     auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
-    simdGrid.concurrent<8>(
+    simdGrid.concurrent(
         acc,
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh) constexpr
         {
@@ -869,8 +869,10 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
         dc_,
         static_cast<int>(points_.n)));
 
+    // use int as data type since we handle indecision and float value in the kernels
+    uint32_t elementsPerFrameItem = alpaka::getNumElemPerThread<int>(alpaka::onHost::getApi(queue_));
     alpaka::Vec<Idx, dim> const blocksPerGridSimd(
-        static_cast<Idx>(ceil(points_.n / ((float) threadsPerBlock[0] * 2u))));
+        static_cast<Idx>(ceil(points_.n / ((float) (threadsPerBlock[0] * elementsPerFrameItem)))));
     auto const manualWorkDivSimd = alpaka::onHost::FrameSpec{blocksPerGridSimd, threadsPerBlock};
 
     typename CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>::DeviceRunner::
