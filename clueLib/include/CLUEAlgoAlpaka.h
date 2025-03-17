@@ -786,43 +786,46 @@ operator()(
             ptrs_.clusterIndex[idxThisSeed] = idxCls;
         }
 
-        // push_back idThisSeed to localStack
-
-
         for(auto [stackIdx] : alpaka::onAcc::makeIdxMap(
                 acc,
                 alpaka::onAcc::worker::threadsInBlock,
                 alpaka::IdxRange{(unsigned int) ptrs_.followers_[idxThisSeed].size()}))
         {
-            assert(localStackSize < localStackSizePerSeed);
-            int rootIdx =  ptrs_.followers_[idxThisSeed][stackIdx];
-            localStack[localStackSize] = rootIdx;
+            int rootIdx = ptrs_.followers_[idxThisSeed][stackIdx];
             ptrs_.clusterIndex[rootIdx] = idxCls;
-            localStackSize++;
+            int currentRootIdx = rootIdx;
 
-            // process all elements in localStack
-            while(localStackSize > 0)
+            if(ptrs_.followers_[currentRootIdx].size() > 0)
             {
-                // get last element of localStack
-                assert(localStackSize - 1 < localStackSizePerSeed);
-                int idxEndOflocalStack = localStack[localStackSize - 1];
-
-                int temp_clusterIndex = ptrs_.clusterIndex[idxEndOflocalStack];
-                // pop_back last element of localStack
-                assert(localStackSize - 1 < localStackSizePerSeed);
-                localStack[localStackSize - 1] = -1;
-                localStackSize--;
-
-                // loop over followers of last element of localStack
-                for(int j : ptrs_.followers_[idxEndOflocalStack])
+                // process all elements in localStack
+                do
                 {
-                    // pass id to follower
-                    ptrs_.clusterIndex[j] = temp_clusterIndex;
-                    // push_back follower to localStack
-                    assert(localStackSize < localStackSizePerSeed);
-                    localStack[localStackSize] = j;
-                    localStackSize++;
-                }
+                    if(currentRootIdx != rootIdx)
+                    {
+                        // get last element of localStack
+                        assert(localStackSize - 1 < localStackSizePerSeed);
+                        currentRootIdx = localStack[localStackSize - 1];
+
+                        // pop_back last element of localStack
+                        localStack[localStackSize - 1] = -1;
+                        localStackSize--;
+                    }
+
+                    // loop over followers of last element of localStack
+                    for(int j : ptrs_.followers_[currentRootIdx])
+                    {
+                        // pass id to follower
+                        ptrs_.clusterIndex[j] = idxCls;
+                        if(ptrs_.followers_[currentRootIdx].size() > 0)
+                        {
+                            // push_back follower to localStack
+                            assert(localStackSize < localStackSizePerSeed);
+                            localStack[localStackSize] = j;
+                            localStackSize++;
+                        }
+                    }
+                    currentRootIdx = -1;
+                } while(localStackSize > 0);
             }
         }
     }
@@ -892,7 +895,9 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     // Dimension the grid for submission
     alpaka::Vec<Idx, dim> const threadsPerBlockX(64u);
-    alpaka::Vec<Idx, dim> const blocksPerGridX(static_cast<Idx>(ceil(points_.n / (float) threadsPerBlock[0])));
+
+    // This value is too large and should be substituted with something reasonable
+    alpaka::Vec<Idx, dim> const blocksPerGridX(static_cast<Idx>(points_.n));
 
     auto const manualWorkDivX = alpaka::onHost::FrameSpec{blocksPerGridX, threadsPerBlockX};
 
