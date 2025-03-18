@@ -845,7 +845,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     // Dimension the grid for submission
     alpaka::Vec<Idx, dim> const threadsPerBlock(1024u);
-    alpaka::Vec<Idx, dim> const blocksPerGrid(static_cast<Idx>(ceil(points_.n / (float) threadsPerBlock[0])));
+    alpaka::Vec<Idx, dim> const blocksPerGrid(alpaka::divExZero(static_cast<Idx>(points_.n), threadsPerBlock[0]));
 
     auto const manualWorkDiv = alpaka::onHost::FrameSpec{blocksPerGrid, threadsPerBlock};
 
@@ -872,7 +872,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     // use int as data type since we handle indecision and float value in the kernels
     uint32_t elementsPerFrameItem = alpaka::getNumElemPerThread<int>(alpaka::onHost::getApi(queue_));
     alpaka::Vec<Idx, dim> const blocksPerGridSimd(
-        static_cast<Idx>(ceil(points_.n / ((float) (threadsPerBlock[0] * elementsPerFrameItem)))));
+        alpaka::divExZero(static_cast<Idx>(points_.n), (threadsPerBlock[0] * elementsPerFrameItem)));
     auto const manualWorkDivSimd = alpaka::onHost::FrameSpec{blocksPerGridSimd, threadsPerBlock};
 
     typename CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>::DeviceRunner::
@@ -1025,17 +1025,10 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     // Dimension the grid for submission
     Idx threads_per_block = 256u;
-#if 0
-    // for alpaka we do not need to reduce the number of threads per block because we use the FrameSpec
-    if constexpr(std::is_same_v<ALPAKA_TYPEOF(device_), ALPAKA_TYPEOF(host_)>)
-    {
-        threads_per_block = 1u;
-    }
-#endif
+
     alpaka::Vec<Idx, dim> const threadsPerBlock(threads_per_block);
 
-    alpaka::Vec<Idx, dim> const blocksPerGrid(static_cast<Idx>(ceil(points / (float) threadsPerBlock[0])));
-    alpaka::Vec<Idx, dim> const elementsPerThread(1u);
+    alpaka::Vec<Idx, dim> const blocksPerGrid(alpaka::divExZero(static_cast<Idx>(points), threadsPerBlock[0]));
 
     auto const manualWorkDiv = alpaka::onHost::FrameSpec{blocksPerGrid, threadsPerBlock};
 
