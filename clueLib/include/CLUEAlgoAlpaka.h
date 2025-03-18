@@ -515,6 +515,8 @@ operator()(
                     // in the rare case where rho is the same, use indices
                     foundHigher = foundHigher || ((ptrs_.rho[j] == rhoi) && (j > i));
 
+                    // combine the three conditions to avoid branching into different code segments to speedup the
+                    // memory write a little bit
                     bool condition
                         = foundHigher && dist_ij < deltai
                           || dist_ij == deltai && ((ptrs_.rho[j] > rho_max) || (ptrs_.rho[j] == rho_max && j > i));
@@ -525,10 +527,10 @@ operator()(
                         nearestHigheri = j;
                     }
                 }
-            } // end of loop over bins in search box
-            ptrs_.delta[i] = std::sqrt(deltai);
-            ptrs_.nearestHigher[i] = nearestHigheri;
-        }
+            }
+        } // end of loop over bins in search box
+        ptrs_.delta[i] = std::sqrt(deltai);
+        ptrs_.nearestHigher[i] = nearestHigheri;
     }
 }
 
@@ -590,6 +592,8 @@ operator()(
                     // in the rare case where rho is the same, use detid
                     foundHigher = foundHigher || ((ptrs_.rho[j] == rhoi) && (ptrs_.detid[j] > ptrs_.detid[i]));
 
+                    // combine the three conditions to avoid branching into different code segments to speedup the
+                    // memory write a little bit
                     bool condition = foundHigher && dist_ij < deltai
                                      || dist_ij == deltai
                                             && ((ptrs_.rho[j] > rho_max)
@@ -600,8 +604,8 @@ operator()(
                         deltai = dist_ij;
                         nearestHigheri = j;
                     }
-                } // end of interate inside this bin
-            }
+                }
+            } // end of interate inside this bin
         } // end of loop over bins in search box
         ptrs_.delta[i] = std::sqrt(deltai);
         ptrs_.nearestHigher[i] = nearestHigheri;
@@ -618,6 +622,12 @@ operator()(
     float kappa,
     unsigned int const numberOfPoints) const -> void
 {
+    /* This looks boring and is boring.
+     * Normally the MdSPan object would be passed as argument but since the original code only stores pointers I
+     * decided to create the MdSpan on the fly. The alignment is set to a safe value and could also be `sizeof(type) *
+     * simdWidth` because alpaka is always aligning allocated memory to simdWidth. MdSpan is required for the
+     * concurrent for each to generate SIMD code and/or at least code instruction level parallel code.
+     */
     auto clusterIndexSpan = makeMdSpan(
         ptrs_.clusterIndex,
         alpaka::Vec{numberOfPoints},
@@ -695,6 +705,7 @@ operator()(
     float rhoc,
     unsigned int const numberOfPoints) const -> void
 {
+    // see the kernel above
     auto clusterIndexSpan = makeMdSpan(
         ptrs_.clusterIndex,
         alpaka::Vec{numberOfPoints},
@@ -770,9 +781,29 @@ operator()(
             *numberOfClustersScalar = ptrs_.seeds_[0].size();
         }
     }
+
+#if ALPAKA_LANG_CUDA && __CUDA_ARCH__
+    /* alpaka has currently not implemented warps. Never the less it is possible to define any kind of group therefore
+     * we hard code a warp size of 32 if CLUE_USE_CUDA_WARP is defined and use later warps in a grid to iterate over
+     * the seed noods and all therads within a warp to iterate of the followers of the seed node.
+     * Currently the start parameters are not adjusted for warps and we use always the same frame extent.
+     * Native support for warps is coming soon! */
+#    define CLUE_USE_CUDA_WARP 1
+#endif
+
+    // iterate with thread blocks over the seed particles
     for(auto [idxCls] : alpaka::onAcc::makeIdxMap(
             acc,
+#if CLUE_USE_CUDA_WARP
+            alpaka::onAcc::WorkerGroup{
+                (acc[alpaka::layer::block].idx() * acc[alpaka::layer::thread].count()
+                 + acc[alpaka::layer::thread].idx())
+                    / 32u,
+                (acc[alpaka::layer::thread].count() * acc[alpaka::layer::block].count()) / 32u},
+#else
             alpaka::onAcc::worker::blocksInGrid,
+#endif
+
             alpaka::IdxRange{(unsigned int) ptrs_.seeds_[0].size()}))
     {
         int localStack[localStackSizePerSeed] = {-1};
@@ -786,9 +817,14 @@ operator()(
             ptrs_.clusterIndex[idxThisSeed] = idxCls;
         }
 
+        // the first level of the hierarchy will be processed by all threads in a block
         for(auto [stackIdx] : alpaka::onAcc::makeIdxMap(
                 acc,
+#if CLUE_USE_CUDA_WARP
+                alpaka::onAcc::WorkerGroup{alpaka::Vec{acc[alpaka::layer::thread].idx() % 32u}, 32u},
+#else
                 alpaka::onAcc::worker::threadsInBlock,
+#endif
                 alpaka::IdxRange{(unsigned int) ptrs_.followers_[idxThisSeed].size()}))
         {
             int rootIdx = ptrs_.followers_[idxThisSeed][stackIdx];
@@ -800,6 +836,7 @@ operator()(
                 // process all elements in localStack
                 do
                 {
+                    // during the first visit of this loop we do not need from the stack
                     if(currentRootIdx != rootIdx)
                     {
                         // get last element of localStack
@@ -816,6 +853,8 @@ operator()(
                     {
                         // pass id to follower
                         ptrs_.clusterIndex[j] = idxCls;
+                        // push only to the stack of we have followers to avoid useless memory operations and reduce
+                        // the number of elements on te stack
                         if(ptrs_.followers_[currentRootIdx].size() > 0)
                         {
                             // push_back follower to localStack
@@ -824,6 +863,7 @@ operator()(
                             localStackSize++;
                         }
                     }
+                    // reset the current root to load next index from the stack
                     currentRootIdx = -1;
                 } while(localStackSize > 0);
             }

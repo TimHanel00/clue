@@ -391,7 +391,7 @@ int main(int argc, char* argv[])
             },
             alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
 #else
-        std::cout<<"xx"<<std::endl;
+        std::cout << "xx" << std::endl;
         mainRun(
             inputFileName,
             outputFileName,
