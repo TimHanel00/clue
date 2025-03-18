@@ -303,13 +303,12 @@ int main(int argc, char* argv[])
     bool verbose = false;
     float dc = 20.f, rhoc = 80.f, outlierDeltaFactor = 2.f;
     int repeats = 10;
-    int TBBNumberOfThread = 1;
     int opt;
     std::string inputFileName;
     std::string alpakaExecutor;
     bool list_alpaka_executors = false;
 
-    while((opt = getopt(argc, argv, "i:d:r:o:e:t:u:Uv")) != -1)
+    while((opt = getopt(argc, argv, "i:d:r:o:e:u:Uv")) != -1)
     {
         switch(opt)
         {
@@ -328,11 +327,6 @@ int main(int argc, char* argv[])
         case 'e': /* number of repeated session(s) a the selected input file */
             repeats = stoi(string(optarg));
             break;
-        case 't': /* number of TBB threads */
-            TBBNumberOfThread = stoi(string(optarg));
-            std::cout << "Using " << TBBNumberOfThread;
-            std::cout << " TBB Threads" << std::endl;
-            break;
         case 'u': /* Use accelerator */
             use_accelerator = true;
             alpakaExecutor = string(optarg);
@@ -345,8 +339,7 @@ int main(int argc, char* argv[])
             break;
         default:
             std::cout << "bin/main -i [fileName] -d [dc] -r [rhoc] -o "
-                         "[outlierDeltaFactor] -e [repeats] -t "
-                         "[NumTBBThreads] -u [executor] -v"
+                         "[outlierDeltaFactor] -e [repeats] -u [executor] -v"
                       << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -398,6 +391,7 @@ int main(int argc, char* argv[])
             },
             alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
 #else
+        std::cout<<"xx"<<std::endl;
         mainRun(
             inputFileName,
             outputFileName,

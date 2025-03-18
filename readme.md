@@ -8,10 +8,10 @@ Z.Chen[1], A. Di Pilato[2,3], F. Pantaleo[4], M. Rovere[4], C. Seez[5]
 
 ## 1. Setup
 
-The pre-requisite dependencies are `>=gcc7`, `<=gcc8.3`, `Boost`, `TBB`. Fork this repo if developers.
+The pre-requisite dependencies are C++20 compiler. Fork this repo if developers.
 
 If CUDA/nvcc are found on the machine, the compilation is performed automatically also for the GPU case.
-The path to the nvcc compiler will be automatically taken from the machine. In this case, `>=cuda10` and `<=nvcc11.2` are also required.
+The path to the nvcc compiler will be automatically taken from the machine. In this case, `>=cuda12` is required.
 
 * **On a CERN machine with GPUs:** Source the LCG View containing GCC, Boost
 and CUDA:
@@ -29,11 +29,8 @@ mkdir install
 cd build/ ; cmake .. -DCMAKE_INSTALL_PREFIX=../install; make install
 ```
 
-* **On an Ubuntu machine with GPUs:** Install Boost and TBB first.
+* **On an Ubuntu machine with GPUs:** 
 ```bash
-sudo apt-get install libtbb-dev
-sudo apt-get install libboost-all-dev
-
 # then setup this project
 git clone --recurse-submodules https://gitlab.cern.ch/kalos/clue.git
 cd clue
@@ -60,8 +57,6 @@ The test program accept the following parameter from the command line:
 * `-e sessions`: number of times the clustering algorithm has to run on the
   same input dataset. That's useful to have a more reliable measure of the
   timing performance.
-* `-t number_TBB_threads`: set the number of TBB threads to be used (when this
-  makes sense)
 * `-u accelerator`: run with the alpaka executor. You can find valid options with `-U` Every
   single executable, in fact, has both the CPU and the GPU version embedded.
 * `-U`: list enabled alpaka executors.
@@ -83,7 +78,7 @@ If the projects compiles without errors, you can go run the CLUE algorithm by
 ./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v
 
 # in case of original CUDA without alpaka
-./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u "cuda"
+./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u cuda
 ```
 
 The input files are `data/input/*.csv` with columns 
