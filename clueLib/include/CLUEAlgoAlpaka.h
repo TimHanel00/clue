@@ -815,10 +815,10 @@ operator()(
         }
         //static_assert(!std::is_same_v<decltype(alpaka::onAcc::worker::threadsInBlock),decltype(alpaka::onAcc::worker::threadsInBlock)>);
         // the first level of the hierarchy will be processed by all threads in a block
-        for(auto [stackIdx] : alpaka::onAcc::makeIdxMap(
+        for(auto [stackIdx] : alpaka::onAcc::makeIdxMap( //<-THIS idxMapping fails
                 acc,
 #if CLUE_USE_CUDA_WARP
-                alpaka::onAcc::WorkerGroup{alpaka::Vec{acc[alpaka::layer::thread].idx() % 32u}, 32u},
+                alpaka::onAcc::WorkerGroup{alpaka::Vec<uint32_t,1u>{acc[alpaka::layer::thread].idx() % 32u}, alpaka::Vec{32u}},
 #else
                 alpaka::onAcc::worker::threadsInBlock,
 #endif
