@@ -269,21 +269,24 @@ private:
     // This means the view will, possibly, become invalid if, in the meantime,
     // the vector re-allocated its underlying storage.
     template<typename TT>
-    auto getViewHost(TT& t)
+    auto getViewHost(std::vector<TT>& t)
     {
-        using type = typename TT::value_type;
+        using type = typename std::vector<TT>::value_type;
         using ExtentType = alpaka::Vec<Idx, 1u>;
         ExtentType vectorSize(static_cast<Idx>(t.size()));
 
         auto deleter = [](type* ptr) {};
         auto pitches = ExtentType{sizeof(type)};
-        auto data = std::make_shared<alpaka::onHost::Data<ALPAKA_TYPEOF(host_), type, ExtentType, ExtentType>>(
+        /*
+        alpaka::onHost::data()
+        alpaka::makeMdSpan(t.data(),)
+        auto data = std::make_shared<alpaka::onHost::internal::Data<ALPAKA_TYPEOF(host_), type, ExtentType, ExtentType>>(
             host_,
             t.data(),
             vectorSize,
             pitches,
-            std::move(deleter));
-        return alpaka::onHost::View<std::decay_t<decltype(data)>, ExtentType>(data);
+            std::move(deleter));*/
+        return alpaka::View(alpaka::api::host,t.data(),vectorSize,pitches);
     }
 
     template<typename TT>
@@ -294,13 +297,7 @@ private:
 
         auto deleter = [](TT* ptr) {};
         auto pitches = ExtentType{sizeof(TT)};
-        auto data = std::make_shared<alpaka::onHost::Data<ALPAKA_TYPEOF(host_), TT, ExtentType, ExtentType>>(
-            host_,
-            t,
-            vectorSize,
-            pitches,
-            std::move(deleter));
-        return alpaka::onHost::View<std::decay_t<decltype(data)>, ExtentType>(data);
+        return alpaka::View(alpaka::api::host,t,vectorSize,pitches);
     }
 
     void copy_todevice()
@@ -652,7 +649,7 @@ operator()(
         alpaka::Vec{sizeof(float)},
         alpaka::Alignment<sizeof(float)>{});
 
-    auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
+    auto simdGrid = alpaka::onAcc::SimdAlgo{alpaka::onAcc::worker::threadsInGrid};
     simdGrid.concurrent(
         acc,
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh, auto&& simdSigmaNoise) constexpr
@@ -724,7 +721,7 @@ operator()(
         alpaka::Vec{sizeof(float)},
         alpaka::Alignment<sizeof(float)>{});
 
-    auto simdGrid = alpaka::onAcc::SimdForEach{alpaka::onAcc::worker::threadsInGrid};
+    auto simdGrid = alpaka::onAcc::SimdAlgo{alpaka::onAcc::worker::threadsInGrid};
     simdGrid.concurrent(
         acc,
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh) constexpr
@@ -816,7 +813,7 @@ operator()(
         {
             ptrs_.clusterIndex[idxThisSeed] = idxCls;
         }
-
+        //static_assert(!std::is_same_v<decltype(alpaka::onAcc::worker::threadsInBlock),decltype(alpaka::onAcc::worker::threadsInBlock)>);
         // the first level of the hierarchy will be processed by all threads in a block
         for(auto [stackIdx] : alpaka::onAcc::makeIdxMap(
                 acc,
@@ -825,7 +822,7 @@ operator()(
 #else
                 alpaka::onAcc::worker::threadsInBlock,
 #endif
-                alpaka::IdxRange{(unsigned int) ptrs_.followers_[idxThisSeed].size()}))
+                alpaka::IdxRange{alpaka::Vec<uint32_t,1u>{ptrs_.followers_[idxThisSeed].size()}}))
         {
             int rootIdx = ptrs_.followers_[idxThisSeed][stackIdx];
             ptrs_.clusterIndex[rootIdx] = idxCls;
@@ -910,7 +907,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
         static_cast<int>(points_.n)));
 
     // use int as data type since we handle indecision and float value in the kernels
-    uint32_t elementsPerFrameItem = alpaka::getNumElemPerThread<int>(alpaka::onHost::getApi(queue_));
+    uint32_t elementsPerFrameItem = alpaka::getNumElemPerThread<int>(queue_);
     alpaka::Vec<Idx, dim> const blocksPerGridSimd(
         alpaka::divExZero(static_cast<Idx>(points_.n), (threadsPerBlock[0] * elementsPerFrameItem)));
     auto const manualWorkDivSimd = alpaka::onHost::FrameSpec{blocksPerGridSimd, threadsPerBlock};
@@ -954,7 +951,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     alpaka::onHost::wait(queue_);
     start = std::chrono::high_resolution_clock::now();
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeHistogram);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeHistogram);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -962,7 +959,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- computeHistogram:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -970,7 +967,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- computeLocalDensity:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigherNoDetId);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigherNoDetId);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -980,11 +977,11 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     start = std::chrono::high_resolution_clock::now();
     if(useAbsoluteSigma_)
     {
-        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivSimd, kernelFindClustersKappa);
+        queue_.enqueue(TExecutor{}, manualWorkDivSimd, kernelFindClustersKappa);
     }
     else
     {
-        alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivSimd, kernelFindClusters);
+        queue_.enqueue(TExecutor{}, manualWorkDivSimd, kernelFindClusters);
     }
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
@@ -993,7 +990,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- findClusters:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDivX, kernelAssignClusters);
+    queue_.enqueue(TExecutor{}, manualWorkDivX, kernelAssignClusters);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -1120,12 +1117,12 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     // Enqueue the kernel execution task
 
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeHistogram);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeHistogram);
 #if ORDER_TILE
     alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelSortHistogram);
 #endif
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigher);
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelFindClustersKappa);
-    alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelAssignClusters);
+    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
+    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigher);
+    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelFindClustersKappa);
+    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelAssignClusters);
 }
