@@ -1,0 +1,1060 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target"
+		],
+		"files" : 
+		[
+			"alpaka/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 317,
+				"parent" : 0
+			}
+		]
+	},
+	"id" : "alpakaIde::@c35f945c6810e2e71ddb",
+	"name" : "alpakaIde",
+	"paths" : 
+	{
+		"build" : "alpaka",
+		"source" : "alpaka"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				71,
+				72,
+				97,
+				98,
+				99,
+				119,
+				133,
+				147,
+				148,
+				149
+			]
+		},
+		{
+			"name" : "api",
+			"sourceIndexes" : 
+			[
+				7,
+				8,
+				9,
+				16,
+				17,
+				42,
+				58,
+				59
+			]
+		},
+		{
+			"name" : "api\\cuda",
+			"sourceIndexes" : 
+			[
+				10,
+				11,
+				12,
+				13,
+				14,
+				15
+			]
+		},
+		{
+			"name" : "api\\hip",
+			"sourceIndexes" : 
+			[
+				18,
+				19,
+				20,
+				21,
+				22,
+				23
+			]
+		},
+		{
+			"name" : "api\\host",
+			"sourceIndexes" : 
+			[
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				35,
+				39,
+				40,
+				41
+			]
+		},
+		{
+			"name" : "api\\host\\block\\mem",
+			"sourceIndexes" : 
+			[
+				30,
+				31,
+				32
+			]
+		},
+		{
+			"name" : "api\\host\\block\\sync",
+			"sourceIndexes" : 
+			[
+				33,
+				34
+			]
+		},
+		{
+			"name" : "api\\host\\exec",
+			"sourceIndexes" : 
+			[
+				36,
+				37,
+				38
+			]
+		},
+		{
+			"name" : "api\\oneApi",
+			"sourceIndexes" : 
+			[
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49
+			]
+		},
+		{
+			"name" : "api\\syclGeneric",
+			"sourceIndexes" : 
+			[
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57
+			]
+		},
+		{
+			"name" : "api\\unifiedCudaHip",
+			"sourceIndexes" : 
+			[
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70
+			]
+		},
+		{
+			"name" : "core",
+			"sourceIndexes" : 
+			[
+				73,
+				74,
+				75,
+				76,
+				77,
+				78,
+				79,
+				80,
+				81,
+				82,
+				83,
+				84,
+				85,
+				86,
+				87,
+				88,
+				89,
+				90,
+				91,
+				92,
+				93,
+				94
+			]
+		},
+		{
+			"name" : "example",
+			"sourceIndexes" : 
+			[
+				95,
+				96
+			]
+		},
+		{
+			"name" : "math",
+			"sourceIndexes" : 
+			[
+				100,
+				101
+			]
+		},
+		{
+			"name" : "mem",
+			"sourceIndexes" : 
+			[
+				102,
+				103,
+				104,
+				105,
+				106,
+				107,
+				108,
+				109,
+				110,
+				111,
+				112
+			]
+		},
+		{
+			"name" : "meta",
+			"sourceIndexes" : 
+			[
+				113,
+				114,
+				115,
+				116,
+				117,
+				118
+			]
+		},
+		{
+			"name" : "onAcc",
+			"sourceIndexes" : 
+			[
+				120,
+				121,
+				122,
+				123,
+				124,
+				125,
+				126,
+				127,
+				130,
+				131,
+				132
+			]
+		},
+		{
+			"name" : "onAcc\\internel",
+			"sourceIndexes" : 
+			[
+				128,
+				129
+			]
+		},
+		{
+			"name" : "onHost",
+			"sourceIndexes" : 
+			[
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				146
+			]
+		},
+		{
+			"name" : "onHost\\mem",
+			"sourceIndexes" : 
+			[
+				143,
+				144,
+				145
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/CVec.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/KernelBundle.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/Simd.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/SimdPtr.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/UniqueId.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/Vec.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/alpaka.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/api.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cpu.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/Api.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/Device.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/IdxLayer.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/Platform.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/executor.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/cuda/math.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/executor.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/Api.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/Device.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/IdxLayer.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/Platform.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/executor.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/hip/math.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/Api.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/Device.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/IdxLayer.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/Platform.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/Queue.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/atomic.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/block/mem/OmpStaticShared.hpp",
+			"sourceGroupIndex" : 5
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/block/mem/SharedStorage.hpp",
+			"sourceGroupIndex" : 5
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/block/mem/SingleThreadStaticShared.hpp",
+			"sourceGroupIndex" : 5
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/block/sync/NoOp.hpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/block/sync/Omp.hpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/cpuArchSize.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/exec/OmpBlocks.hpp",
+			"sourceGroupIndex" : 7
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/exec/OmpThreads.hpp",
+			"sourceGroupIndex" : 7
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/exec/Serial.hpp",
+			"sourceGroupIndex" : 7
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/executor.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/sysInfo.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/host/tag.hpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/Api.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/Device.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/Platform.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/Queue.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/StaticSharedMemory.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/executor.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/oneApi/math.hpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/Api.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/Device.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/Platform.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/Queue.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/atomic.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/math.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/onAcc.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/syclGeneric/tag.hpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/trait.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/ComputeApi.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/Device.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/MemcpyKind.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/Platform.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/Queue.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/atomic.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/atomicBuiltIn.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/concepts.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/math.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/tag.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/api/unifiedCudaHip/trait.hpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/cast.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/concepts.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/ApiCudaRt.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/ApiHipRt.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Assert.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/CallbackThread.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Cuda.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/CudaHipCommon.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Debug.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/DemangleTypeNames.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Dict.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Hip.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/PP.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/RemoveRestrict.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Tag.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/UniformCudaHip.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Unreachable.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Utility.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/Vectorize.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/alignedAlloc.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/common.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/config.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/decay.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/core/util.hpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/example/executeForEach.hpp",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/example/executors.hpp",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/interface.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/internal.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/math.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/math/constants.hpp",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/math/math.hpp",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/Alignment.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/DataPitches.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/FlatIdxContainer.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/IdxRange.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/Iter.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/MdSpan.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/ThreadSpace.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/TiledIdxContainer.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/View.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/concepts.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/mem/trait.hpp",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/Concatenate.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/IntegerSequence.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/NdLoop.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/Set.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/TypeListOps.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/meta/filter.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/Acc.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/GlobalMem.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/SimdAlgo.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/WorkGroup.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/atomic.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/atomicHierarchy.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/atomicOp.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/internal.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/internel/SimdConcurrent.hpp",
+			"sourceGroupIndex" : 17
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/internel/SimdTransformReduce.hpp",
+			"sourceGroupIndex" : 17
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/layout.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/tag.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onAcc/traverse.hpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/Device.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/DeviceProperties.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/DeviceSelector.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/FrameSpec.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/Handle.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/Queue.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/ThreadSpec.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/concepts.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/internal.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/mem/ManagedView.hpp",
+			"sourceGroupIndex" : 19
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/mem/MangedDealloc.hpp",
+			"sourceGroupIndex" : 19
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/mem/stdContainer.hpp",
+			"sourceGroupIndex" : 19
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/onHost/trait.hpp",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/tag.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/trait.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/vecConcepts.hpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "UTILITY"
+}

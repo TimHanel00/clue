@@ -1,0 +1,52 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"clueLib/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 15,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include/CLUE",
+			"paths" : 
+			[
+				"clueLib/include/CLUEAlgo.h",
+				"clueLib/include/CLUEAlgoAlpaka.h",
+				"clueLib/include/CLUEAlgoGPU.h",
+				"clueLib/include/GPUVecArray.h",
+				"clueLib/include/GPUVecArrayAlpaka.h",
+				"clueLib/include/Points.h",
+				"clueLib/include/Tiles.h",
+				"clueLib/include/TilesAlpaka.h",
+				"clueLib/include/TilesConstants.h",
+				"clueLib/include/TilesGPU.h"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "clueLib",
+		"source" : "clueLib"
+	}
+}
