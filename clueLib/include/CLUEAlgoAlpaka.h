@@ -789,7 +789,7 @@ operator()(
      * the seed noods and all therads within a warp to iterate of the followers of the seed node.
      * Currently the start parameters are not adjusted for warps and we use always the same frame extent.
      * Native support for warps is coming soon! */
-#    define CLUE_USE_CUDA_WARP 0
+#    define CLUE_USE_CUDA_WARP 1
 #endif
 
     // iterate with thread blocks over the seed particles
@@ -887,8 +887,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     clear_internal_buffers();
     // Dimension the grid for submission
-   // alpaka::Vec<Idx, dim> const threadsPerBlock(1024u);
-    alpaka::Vec<Idx, dim> const threadsPerBlock(2048u);
+    alpaka::Vec<Idx, dim> const threadsPerBlock(1024u);
     alpaka::Vec<Idx, dim> const blocksPerGrid(alpaka::divExZero(static_cast<Idx>(points_.n), threadsPerBlock[0]));
 
     auto const manualWorkDiv = alpaka::onHost::FrameSpec{blocksPerGrid, threadsPerBlock};
