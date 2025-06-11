@@ -109,6 +109,9 @@ CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/tim/hzdr/workspace/clue/cmake-build-debug/CMakeFiles/pkgRedirects
 
+//HIP compiler
+CMAKE_HIP_COMPILER:FILEPATH=NOTFOUND
+
 //User executables (bin)
 CMAKE_INSTALL_BINDIR:PATH=bin
 
@@ -439,6 +442,8 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//ADVANCED property for variable: CMAKE_HIP_COMPILER
+CMAKE_HIP_COMPILER-ADVANCED:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/tim/hzdr/workspace/clue

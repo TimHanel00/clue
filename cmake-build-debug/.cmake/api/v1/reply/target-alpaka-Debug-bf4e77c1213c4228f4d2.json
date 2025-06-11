@@ -1,0 +1,52 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library"
+		],
+		"files" : 
+		[
+			"alpaka/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 86,
+				"parent" : 0
+			}
+		]
+	},
+	"id" : "alpaka::@c35f945c6810e2e71ddb",
+	"name" : "alpaka",
+	"paths" : 
+	{
+		"build" : "alpaka",
+		"source" : "alpaka"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "tune\\active",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "alpaka/include/alpaka/tune/active/Queue.h",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "INTERFACE_LIBRARY"
+}

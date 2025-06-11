@@ -124,6 +124,12 @@ build install/strip: phony CMakeFiles/install/strip.util
 
 
 #############################################
+# Utility command for alpaka
+
+build alpaka/alpaka: phony
+
+
+#############################################
 # Utility command for alpakaIde
 
 build alpaka/alpakaIde: phony
@@ -496,7 +502,7 @@ build src/clue/install/strip: phony src/clue/CMakeFiles/install/strip.util
 #############################################
 # Order-only phony target for mainAlpaka
 
-build cmake_object_order_depends_target_mainAlpaka: phony || .
+build cmake_object_order_depends_target_mainAlpaka: phony || alpaka/alpaka
 
 build src/clue_alpaka/CMakeFiles/mainAlpaka.dir/__/main.cpp.o: CXX_COMPILER__mainAlpaka_unscanned_Debug /home/tim/hzdr/workspace/clue/src/main.cpp || cmake_object_order_depends_target_mainAlpaka
   DEFINES = -DALPAKA_HAS_STD_ATOMIC_REF -DUSE_ALPAKA
@@ -514,7 +520,7 @@ build src/clue_alpaka/CMakeFiles/mainAlpaka.dir/__/main.cpp.o: CXX_COMPILER__mai
 #############################################
 # Link the executable src/clue_alpaka/mainAlpaka
 
-build src/clue_alpaka/mainAlpaka: CXX_EXECUTABLE_LINKER__mainAlpaka_Debug src/clue_alpaka/CMakeFiles/mainAlpaka.dir/__/main.cpp.o | /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so /usr/lib/x86_64-linux-gnu/libpthread.a
+build src/clue_alpaka/mainAlpaka: CXX_EXECUTABLE_LINKER__mainAlpaka_Debug src/clue_alpaka/CMakeFiles/mainAlpaka.dir/__/main.cpp.o | /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so /usr/lib/x86_64-linux-gnu/libpthread.a || alpaka/alpaka
   FLAGS = -g
   LINK_LIBRARIES = /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so  /usr/lib/x86_64-linux-gnu/libpthread.a
   OBJECT_DIR = src/clue_alpaka/CMakeFiles/mainAlpaka.dir
@@ -603,6 +609,8 @@ build src/clue_alpaka/install/strip: phony src/clue_alpaka/CMakeFiles/install/st
 # =============================================================================
 # Target aliases.
 
+build alpaka: phony alpaka/alpaka
+
 build alpakaIde: phony alpaka/alpakaIde
 
 build main: phony src/clue/main
@@ -624,7 +632,7 @@ build all: phony alpaka/all clueLib/all src/all
 #############################################
 # Folder: /home/tim/hzdr/workspace/clue/cmake-build-debug/alpaka
 
-build alpaka/all: phony
+build alpaka/all: phony alpaka/alpaka
 
 # =============================================================================
 

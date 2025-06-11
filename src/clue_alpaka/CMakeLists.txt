@@ -8,7 +8,7 @@ target_compile_options(mainAlpaka PRIVATE
   $<$<COMPILE_LANGUAGE:CUDA>:
                       -Xcompiler;
                       -m64;
-                      -expt-relaxed-constexpr;
+                     -expt-relaxed-constexpr;
                       -w;
 >
 )

@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
         return alpaka::executeForEach(
             [&](auto const& cfg)
             {
-                if(alpakaExecutor == alpaka::onHost::getStaticName(cfg[alpaka::object::exec]))
+                std::cout<<" running on exec: "<<alpaka::onHost::getStaticName(cfg[alpaka::object::exec])<<std::endl;
                     mainRun(
                         inputFileName,
                         outputFileName,
