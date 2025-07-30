@@ -32,7 +32,13 @@ static int const maxNFollowers = 128;
 // followers. Adding more elements with respect to the reserved size will
 // trigger an exception.
 static int const localStackSizePerSeed = 128;
-
+template<typename T_Numblocks,typename T_NumThreads>
+auto& getDefaultSessionFromFrameSpec(const alpaka::onHost::FrameSpec<T_Numblocks,T_NumThreads> & frameSpec)
+{
+    static auto session = alpaka::tune::TuningBuilder{}.withStrategy(alpaka::tune::strategy::exhaustiveSearch{}).
+    withConfig("../clue.toml").withBlockSizeTune().withNumBlocksTune().build();
+    return session;
+}
 // The type T is used to pass the number of bins in each dimension and the
 // allowed ranges spanned. Anchillary quantitied, like the inverse of the bin
 // width should also be provided. Code will not compile if any such information
@@ -41,10 +47,7 @@ template<typename TExecutor, typename TComputeDevice, typename TQueue, typename 
 class CLUEAlgoAlpaka : public CLUEAlgo<T, NLAYERS>
 {
 public:
-    using T_sesionType=decltype(alpaka::tune::TuningBuilder{}.withStrategy(alpaka::tune::strategy::exhaustiveSearch{}).
-        withConfig("../clue.toml").withBlockSizeTune().withNumBlocksTune().build());
-    T_sesionType session =alpaka::tune::TuningBuilder{}.withStrategy(alpaka::tune::strategy::exhaustiveSearch{}).
-        withConfig("../clue.toml").withBlockSizeTune().withNumBlocksTune().build();
+
     static constexpr uint32_t dim = 1u;
     using Idx = uint32_t;
 
@@ -953,10 +956,9 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     auto start = std::chrono::high_resolution_clock::now();
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed;
-
     alpaka::onHost::wait(queue_);
     start = std::chrono::high_resolution_clock::now();
-    session.enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeHistogram);
+    getDefaultSessionFromFrameSpec(manualWorkDiv).enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeHistogram);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -964,7 +966,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- computeHistogram:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    session.enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
+    getDefaultSessionFromFrameSpec(manualWorkDiv).enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -972,7 +974,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- computeLocalDensity:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-     session.enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigherNoDetId);
+     getDefaultSessionFromFrameSpec(manualWorkDiv).enqueue(device_,queue_,TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigherNoDetId);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
@@ -980,13 +982,13 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
     std::cout << fString("--- computeDistanceToHigher:") << elapsed.count() * 1000 << "ms\n";
 
     start = std::chrono::high_resolution_clock::now();
-    if(useAbsoluteSigma_)
+    if(this->useAbsoluteSigma_)
     {
-         session.enqueue(device_,queue_,TExecutor{}, manualWorkDivSimd, kernelFindClustersKappa);
+         getDefaultSessionFromFrameSpec(manualWorkDivSimd).enqueue(device_,queue_,TExecutor{}, manualWorkDivSimd, kernelFindClustersKappa);
     }
     else
     {
-         session.enqueue(device_,queue_,TExecutor{}, manualWorkDivSimd, kernelFindClusters);
+         getDefaultSessionFromFrameSpec(manualWorkDivSimd).enqueue(device_,queue_,TExecutor{}, manualWorkDivSimd, kernelFindClusters);
     }
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
@@ -996,7 +998,7 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 
     start = std::chrono::high_resolution_clock::now();
 
-     session.enqueue(device_,queue_,TExecutor{}, manualWorkDivX, kernelAssignClusters);
+     getDefaultSessionFromFrameSpec(manualWorkDivX).enqueue(device_,queue_,TExecutor{}, manualWorkDivX, kernelAssignClusters);
     alpaka::onHost::wait(queue_); // wait in case we are using an asynchronous queue to
     // time actual kernel runtime
     finish = std::chrono::high_resolution_clock::now();
