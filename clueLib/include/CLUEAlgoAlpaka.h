@@ -1,7 +1,5 @@
 #pragma once
 // clang-format off
-#include <alpaka/alpaka.hpp>
-
 #include "CLUEAlgo.h"
 #include "TilesAlpaka.h"
 
@@ -280,13 +278,9 @@ private:
         /*
         alpaka::onHost::data()
         alpaka::makeMdSpan(t.data(),)
-        auto data = std::make_shared<alpaka::onHost::internal::Data<ALPAKA_TYPEOF(host_), type, ExtentType, ExtentType>>(
-            host_,
-            t.data(),
-            vectorSize,
-            pitches,
-            std::move(deleter));*/
-        return alpaka::View(alpaka::api::host,t.data(),vectorSize,pitches);
+        auto data = std::make_shared<alpaka::onHost::internal::Data<ALPAKA_TYPEOF(host_), type, ExtentType,
+        ExtentType>>( host_, t.data(), vectorSize, pitches, std::move(deleter));*/
+        return alpaka::View(alpaka::api::host, t.data(), vectorSize, pitches);
     }
 
     template<typename TT>
@@ -297,7 +291,7 @@ private:
 
         auto deleter = [](TT* ptr) {};
         auto pitches = ExtentType{sizeof(TT)};
-        return alpaka::View(alpaka::api::host,t,vectorSize,pitches);
+        return alpaka::View(alpaka::api::host, t, vectorSize, pitches);
     }
 
     void copy_todevice()
@@ -655,7 +649,8 @@ operator()(
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh, auto&& simdSigmaNoise) constexpr
         {
             // initialize clusterIndex
-            simdClusterIdx = ALPAKA_TYPEOF(simdClusterIdx.load())::all(-1);
+            using T_SimdType = ALPAKA_TYPEOF(simdClusterIdx.load());
+            simdClusterIdx = T_SimdType::fill(-1);
 
             // determine seed or outlier
             alpaka::concepts::Simd auto deltai = simdDelta.load();
@@ -727,7 +722,8 @@ operator()(
         [&](auto const&, auto&& simdClusterIdx, auto&& simdDelta, auto&& simdRoh) constexpr
         {
             // initialize clusterIndex
-            simdClusterIdx = ALPAKA_TYPEOF(simdClusterIdx.load())::all(-1);
+            using T_SimdType = ALPAKA_TYPEOF(simdClusterIdx.load());
+            simdClusterIdx = T_SimdType::fill(-1);
 
             // determine seed or outlier
             alpaka::concepts::Simd auto deltai = simdDelta.load();
@@ -813,16 +809,18 @@ operator()(
         {
             ptrs_.clusterIndex[idxThisSeed] = idxCls;
         }
-        //static_assert(!std::is_same_v<decltype(alpaka::onAcc::worker::threadsInBlock),decltype(alpaka::onAcc::worker::threadsInBlock)>);
-        // the first level of the hierarchy will be processed by all threads in a block
+        // static_assert(!std::is_same_v<decltype(alpaka::onAcc::worker::threadsInBlock),decltype(alpaka::onAcc::worker::threadsInBlock)>);
+        //  the first level of the hierarchy will be processed by all threads in a block
         for(auto [stackIdx] : alpaka::onAcc::makeIdxMap( //<-THIS idxMapping fails
                 acc,
 #if CLUE_USE_CUDA_WARP
-                alpaka::onAcc::WorkerGroup{alpaka::Vec<uint32_t,1u>{acc[alpaka::layer::thread].idx() % 32u}, alpaka::Vec{32u}},
+                alpaka::onAcc::WorkerGroup{
+                    alpaka::Vec<uint32_t, 1u>{acc[alpaka::layer::thread].idx() % 32u},
+                    alpaka::Vec{32u}},
 #else
                 alpaka::onAcc::worker::threadsInBlock,
 #endif
-                alpaka::IdxRange{alpaka::Vec<uint32_t,1u>{ptrs_.followers_[idxThisSeed].size()}}))
+                alpaka::IdxRange{alpaka::Vec<uint32_t, 1u>{ptrs_.followers_[idxThisSeed].size()}}))
         {
             int rootIdx = ptrs_.followers_[idxThisSeed][stackIdx];
             ptrs_.clusterIndex[rootIdx] = idxCls;
@@ -1121,8 +1119,8 @@ void CLUEAlgoAlpaka<TExecutor, TComputeDevice, TQueue, THostDevice, T, NLAYERS>:
 #if ORDER_TILE
     alpaka::onHost::enqueue(queue_, TExecutor{}, manualWorkDiv, kernelSortHistogram);
 #endif
-    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
-    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigher);
-    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelFindClustersKappa);
-    queue_.enqueue( TExecutor{}, manualWorkDiv, kernelAssignClusters);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeLocalDensity);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelComputeDistanceToHigher);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelFindClustersKappa);
+    queue_.enqueue(TExecutor{}, manualWorkDiv, kernelAssignClusters);
 }
