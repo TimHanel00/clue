@@ -1,3 +1,4 @@
 [submodule "alpaka"]
     path = alpaka
-    url = git@github.com:TimHanel00/alpaka3_Tuner.git
+    url = git@github.com:alpaka-group/alpaka3.git
+    branch = dev
